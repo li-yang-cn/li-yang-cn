@@ -1,10 +1,8 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Categories on Yang Li</title>
-    <link>https://liyang.tech/categories/</link>
-    <description>Recent content in Categories on Yang Li</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en</language><atom:link href="https://liyang.tech/categories/index.xml" rel="self" type="application/rss+xml" />
-  </channel>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Categories - Category - Yang Li&#39;s Website</title>
+        <link>https://liyang.tech/categories/</link>
+        <description>Categories - Category - Yang Li&#39;s Website</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>i#li-yang.cn (Yang Li)</managingEditor>
+            <webMaster>i#li-yang.cn (Yang Li)</webMaster><atom:link href="https://liyang.tech/categories/" rel="self" type="application/rss+xml" /></channel>
 </rss>
