@@ -1,5 +1,6 @@
 ### Hi there 👋
-This repository is for my personal webpage, please visit [https://liyang.tech](https://liyang.tech) to view it.
+Welcome! Please visit [https://liyang.tech](https://liyang.tech) to view my Github Page.
+
  
 <!--
 **li-yang-cn/li-yang-cn** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
