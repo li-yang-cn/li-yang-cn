@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支出分摊计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .user-list {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .user-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .user-name {
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .user-amount {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        .add-user-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .add-user-form input {
+            flex: 1;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .result-header h3 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .result-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-card h4 {
+            color: #6c757d;
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-card .amount {
+            color: #667eea;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .transactions {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-text {
+            flex: 1;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .transaction-amount {
+            color: #28a745;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 25px 15px;
+            }
+            
+            .content {
+                padding: 25px 15px;
+            }
+            
+            .add-user-form {
+                flex-direction: column;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .result-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 支出分摊计算器</h1>
+            <p>轻松计算AA制费用分摊</p>
+        </div>
+        
+        <div class="content">
+            <div class="form-group">
+                <label for="projectTitle">项目标题</label>
+                <input type="text" id="projectTitle" class="form-control" placeholder="例如：周末聚餐、旅行费用等">
+            </div>
+            
+            <div class="form-group">
+                <label>参与人员及费用</label>
+                <div class="user-list" id="userList">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <p>请添加参与人员</p>
+                    </div>
+                </div>
+                
+                <div class="add-user-form">
+                    <input type="text" id="newUserName" class="form-control" placeholder="姓名">
+                    <input type="number" id="newUserAmount" class="form-control" placeholder="支付金额" step="0.01" min="0">
+                    <button class="btn btn-success" onclick="addUser()">添加</button>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="calculateExpenses()">计算分摊</button>
+                <button class="btn btn-secondary" onclick="resetForm()">重置</button>
+            </div>
+            
+            <div class="result-section" id="resultSection">
+                <div class="result-header">
+                    <h3 id="resultTitle">分摊结果</h3>
+                </div>
+                
+                <div class="result-summary">
+                    <div class="summary-card">
+                        <h4>总支出</h4>
+                        <div class="amount" id="totalExpenses">¥0.00</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>人均应支付</h4>
+                        <div class="amount" id="averagePerPerson">¥0.00</div>
+                    </div>
+                </div>
+                
+                <div class="transactions" id="transactionsList">
+                    <!-- 交易记录将在这里显示 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let users = [];
+
+        function addUser() {
+            const nameInput = document.getElementById('newUserName');
+            const amountInput = document.getElementById('newUserAmount');
+            
+            const name = nameInput.value.trim();
+            const amount = parseFloat(amountInput.value) || 0;
+            
+            if (!name) {
+                alert('请输入姓名');
+                return;
+            }
+            
+            if (amount < 0) {
+                alert('金额不能为负数');
+                return;
+            }
+            
+            // 检查是否已存在同名用户
+            if (users.some(user => user.name === name)) {
+                alert('该用户已存在');
+                return;
+            }
+            
+            users.push({ name, amount });
+            updateUserList();
+            
+            // 清空输入框
+            nameInput.value = '';
+            amountInput.value = '';
+            nameInput.focus();
+        }
+
+        function removeUser(index) {
+            users.splice(index, 1);
+            updateUserList();
+        }
+
+        function updateUserList() {
+            const userList = document.getElementById('userList');
+            
+            if (users.length === 0) {
+                userList.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <p>请添加参与人员</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            userList.innerHTML = users.map((user, index) => `
+                <div class="user-item">
+                    <div class="user-name">${user.name}</div>
+                    <div class="user-amount">¥${user.amount.toFixed(2)}</div>
+                    <button class="btn btn-danger" onclick="removeUser(${index})">删除</button>
+                </div>
+            `).join('');
+        }
+
+        function calculateExpenses() {
+            if (users.length < 2) {
+                alert('至少需要2个参与人员');
+                return;
+            }
+            
+            const projectTitle = document.getElementById('projectTitle').value.trim() || '支出分摊';
+            
+            // 转换为Python脚本的输入格式
+            const expensesDict = {};
+            users.forEach(user => {
+                expensesDict[user.name] = user.amount;
+            });
+            
+            // 计算结果
+            const result = calculateExpensesMinTransfer(expensesDict);
+            
+            // 显示结果
+            displayResult(projectTitle, result);
+        }
+
+        function calculateExpensesMinTransfer(expensesDict) {
+            const people = Object.keys(expensesDict);
+            
+            // 计算总支出与人均支出
+            const total = Object.values(expensesDict).reduce((sum, val) => sum + val, 0);
+            const average = total / people.length;
+            
+            // 净支付（支出 - 平均值）
+            const netAmounts = {};
+            people.forEach(person => {
+                netAmounts[person] = Math.round((expensesDict[person] - average) * 100) / 100;
+            });
+            
+            // 按顺序映射人名与净额
+            const names = Object.keys(netAmounts);
+            const amounts = names.map(name => netAmounts[name]);
+            
+            const transactions = [];
+            
+            // 找最大债权人
+            function getMaxIndex(arr) {
+                return arr.reduce((maxIndex, current, currentIndex) => 
+                    arr[currentIndex] > arr[maxIndex] ? currentIndex : maxIndex, 0);
+            }
+            
+            // 找最大债务人
+            function getMinIndex(arr) {
+                return arr.reduce((minIndex, current, currentIndex) => 
+                    arr[currentIndex] < arr[minIndex] ? currentIndex : minIndex, 0);
+            }
+            
+            // 递归消除债务
+            function settle(amounts) {
+                const maxCredit = getMaxIndex(amounts);
+                const maxDebit = getMinIndex(amounts);
+                
+                // 终止条件：所有值都接近0
+                if (Math.abs(amounts[maxCredit]) < 0.01 && Math.abs(amounts[maxDebit]) < 0.01) {
+                    return;
+                }
+                
+                // 最小化金额转移
+                const transfer = Math.round(Math.min(-amounts[maxDebit], amounts[maxCredit]) * 100) / 100;
+                amounts[maxCredit] -= transfer;
+                amounts[maxDebit] += transfer;
+                
+                transactions.push([names[maxDebit], names[maxCredit], transfer]);
+                
+                // 递归处理下一个
+                settle(amounts);
+            }
+            
+            // 启动结算过程
+            settle(amounts);
+            
+            return {
+                total_expenses: Math.round(total * 100) / 100,
+                average_per_person: Math.round(average * 100) / 100,
+                transactions: transactions
+            };
+        }
+
+        function displayResult(projectTitle, result) {
+            // 更新标题
+            document.getElementById('resultTitle').textContent = projectTitle;
+            
+            // 更新摘要
+            document.getElementById('totalExpenses').textContent = `¥${result.total_expenses.toFixed(2)}`;
+            document.getElementById('averagePerPerson').textContent = `¥${result.average_per_person.toFixed(2)}`;
+            
+            // 更新交易记录
+            const transactionsList = document.getElementById('transactionsList');
+            if (result.transactions.length === 0) {
+                transactionsList.innerHTML = `
+                    <div class="empty-state">
+                        <p>无需转账，费用已平均分摊</p>
+                    </div>
+                `;
+            } else {
+                transactionsList.innerHTML = result.transactions.map(transaction => `
+                    <div class="transaction-item">
+                        <div class="transaction-text">
+                            ${transaction[0]} 需要向 ${transaction[1]} 转账
+                        </div>
+                        <div class="transaction-amount">
+                            ¥${transaction[2].toFixed(2)}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // 显示结果区域
+            document.getElementById('resultSection').classList.add('show');
+            
+            // 滚动到结果区域
+            document.getElementById('resultSection').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        function resetForm() {
+            users = [];
+            document.getElementById('projectTitle').value = '';
+            document.getElementById('newUserName').value = '';
+            document.getElementById('newUserAmount').value = '';
+            document.getElementById('resultSection').classList.remove('show');
+            updateUserList();
+        }
+
+        // 回车键添加用户
+        document.getElementById('newUserName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addUser();
+            }
+        });
+
+        document.getElementById('newUserAmount').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addUser();
+            }
+        });
+    </script>
+</body>
+</html> 
