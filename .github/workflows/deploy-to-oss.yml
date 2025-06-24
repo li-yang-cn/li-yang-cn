@@ -25,4 +25,4 @@ jobs:
     - name: Upload to OSS
       run: |
         ./ossutil64 rm oss://${{ secrets.OSS_BUCKET }}/ -rf
-        ./ossutil64 cp ./ oss://${{ secrets.OSS_BUCKET }}/ -rf --exclude ".git/*"
+        ./ossutil64 cp ./ oss://${{ secrets.OSS_BUCKET }}/ -rf --exclude ".*"
