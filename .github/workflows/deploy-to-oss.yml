@@ -1,0 +1,28 @@
+name: Deploy to Aliyun OSS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up ossutil
+      run: |
+        curl -O https://gosspublic.alicdn.com/ossutil/1.7.16/ossutil64
+        chmod +x ossutil64
+        ./ossutil64 config \
+          -e ${{ secrets.OSS_ENDPOINT }} \
+          -i ${{ secrets.OSS_KEY_ID }} \
+          -k ${{ secrets.OSS_KEY_SECRET }}
+
+    - name: Upload to OSS
+      run: |
+        ./ossutil64 rm oss://${{ secrets.OSS_BUCKET }}/ -rf
+        ./ossutil64 cp ./ oss://${{ secrets.OSS_BUCKET }}/ -rf --exclude ".git/*"
